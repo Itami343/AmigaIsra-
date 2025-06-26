@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SUBLIK</title>
+  <link rel="icon" type="image/jpg" href="img/logo-sublik.png">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f9f9fb;
+      color: #333;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 70px;
+      background: #f0f0f5;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 60px;
+      transition: width 0.3s;
+      z-index: 999;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar.expanded {
+      width: 200px;
+      align-items: flex-start;
+      padding-left: 10px;
+    }
+
+    .sidebar img {
+      margin: 20px 0;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      filter: grayscale(40%);
+      transition: filter 0.3s;
+    }
+
+    .sidebar img:hover {
+      filter: none;
+    }
+
+    .sidebar span {
+      display: none;
+      margin-left: 10px;
+      color: #555;
+      font-weight: 600;
+      user-select: none;
+    }
+
+    .sidebar.expanded span {
+      display: inline;
+    }
+
+    /* Top bar */
+    .topbar {
+      background: #b86eff;
+      color: skyblue;
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
+      left: 70px;
+      right: 0;
+      height: 60px;
+      z-index: 1000;
+      transition: left 0.3s;
+      box-shadow: 0 2px 6px rgba(184, 110, 255, 0.4);
+    }
+
+    .sidebar.expanded~.topbar {
+      left: 100px;
+    }
+
+    .topbar .logo {
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      font-size: 20px;
+      gap: 8px;
+      user-select: none;
+    }
+
+    .topbar .logo img {
+      width: 150px;
+      height: 150px;
+      object-fit: contain;
+      filter: none;
+    }
+
+    .topbar input {
+      margin-left: 20px;
+      padding: 7px 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 14px;
+      outline: none;
+      transition: box-shadow 0.3s;
+    }
+
+    .topbar input:focus {
+      box-shadow: 0 0 8px #b86eff;
+    }
+
+    .topbar .icons {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .topbar .icons img {
+      cursor: pointer;
+      filter: brightness(0) invert(1);
+      width: 30px;
+      height: 30px;
+      transition: filter 0.3s;
+    }
+
+    .topbar .icons img:hover {
+      filter: brightness(0.8) invert(1);
+    }
+
+    .topbar button {
+      font-family: "Jersey 10", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 20px;
+      background: #ffcc4d;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 700;
+      color: #5a3e00;
+      box-shadow: 0 4px 8px rgba(255, 204, 77, 0.5);
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .topbar button:hover {
+      background-color: #ffdb70;
+      box-shadow: 0 6px 12px rgba(255, 204, 77, 0.7);
+    }
+
+    .content {
+      margin-left: 70px;
+      margin-top: 60px;
+      transition: margin-left 0.3s;
+      padding: 20px 40px 40px;
+      min-height: calc(100vh - 60px);
+      background: white;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      border-radius: 12px;
+    }
+
+    .sidebar.expanded~.content {
+      margin-left: 200px;
+    }
+
+    /* Banner */
+    .banner {
+      background: #fffd88;
+      padding: 20px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 10px rgba(255, 253, 136, 0.4);
+      user-select: none;
+    }
+
+    .banner h1 {
+      font-size: 30px;
+      color: #9a39ff;
+      margin: 0;
+      font-family: "Bungee", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    .banner p {
+      color: #666;
+      max-width: 420px;
+      margin: 8px 0 0 0;
+      font-weight: 600;
+    }
+
+    .banner img {
+      border-radius: 8px;
+      box-shadow: none;
+      user-select: none;
+    }
+
+    /* Delivery steps */
+    .delivery-steps {
+      padding: 40px 20px 20px;
+      background: #fff;
+      text-align: center;
+    }
+
+    .delivery-steps h2 {
+      font-family: "Jersey 10", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 30px;
+      margin-bottom: 30px;
+      user-select: none;
+      text-shadow: none
+    }
+
+    .steps {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 30px;
+      flex-wrap: wrap;
+      gap: 30px;
+    }
+
+    .step {
+      width: 28%;
+      min-width: 220px;
+      background: #f8f0ff;
+      padding: 20px;
+      border-radius: 14px;
+      box-shadow: 0 4px 12px rgba(154, 57, 255, 0.1);
+      transition: transform 0.3s;
+      user-select: none;
+    }
+
+    .step:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 18px rgba(154, 57, 255, 0.2);
+    }
+
+    .step img {
+      width: 96px;
+      height: auto;
+      margin-bottom: 12px;
+    }
+
+    .step p {
+      margin-top: 0;
+      font-size: 15px;
+      line-height: 1.4;
+      color: #4b2a90;
+      font-weight: 600;
+    }
+
+    /* Tienda styles */
+    .tienda-banner {
+      background: #face5d;
+      padding: 30px 40px;
+      margin-top: 20px;
+      border-radius: 14px;
+      box-shadow: 0 6px 15px rgba(184, 110, 255, 0.4);
+      color: white;
+      user-select: none;
+    }
+
+    .inicio-banner {
+      background: white;
+      padding: 30px 40px;
+      margin-top: 1px;
+      margin-bottom: 1px;
+      border-radius: 14px;
+      color: #face5d;
+      text-shadow: 10px 8px 8px #ffff83;
+      user-select: none;
+    }
+
+    .tienda-banner h2 {
+      font-family: "Bungee", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 40px;
+      margin-bottom: 10px;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+    }
+
+    .tienda-banner p {
+      font-size: 16px;
+      font-weight: 600;
+      opacity: 0.9;
+    }
+
+    .productos {
+      padding: 25px 10px 10px;
+    }
+
+    .productos h3 {
+      font-family: "Jersey 10", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      font-size: 30px;
+      margin-bottom: 20px;
+      color: #6f3ebd;
+      user-select: none;
+    }
+
+    .grid-productos {
+      display: flex;
+      gap: 25px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .producto {
+      flex: 1 1 220px;
+      max-width: 220px;
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      user-select: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-bottom: 12px;
+    }
+
+    .producto:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 12px 24px rgba(184, 110, 255, 0.3);
+    }
+
+    .producto.selected {
+      border: 3px solid #b86eff;
+      box-shadow: 0 0 18px #b86eff;
+      transform: translateY(-10px);
+    }
+
+    .producto img {
+      width: 100%;
+      border-bottom: 3px solid #b86eff;
+      border-radius: 12px 12px 0 0;
+      object-fit: cover;
+      height: 200px;
+      user-select: none;
+    }
+
+    .producto p {
+      font-family: "Jersey 10", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      margin: 12px 0 0 0;
+      font-size: 18px;
+      color: #4a1b94;
+      user-select: none;
+    }
+
+    /* Envíos - Mostrar producto seleccionado */
+    .envios-producto {
+      margin-top: 40px;
+      background: #f4eaff;
+      border-radius: 16px;
+      padding: 30px 25px;
+      max-width: 400px;
+      box-shadow: 0 6px 15px rgba(184, 110, 255, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      user-select: none;
+    }
+
+    .envios-producto img {
+      width: 320px;
+      height: 320px;
+      object-fit: cover;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(184, 110, 255, 0.6);
+      margin-bottom: 20px;
+    }
+
+    .envios-producto h3 {
+      font-family: 'Courier New', monospace;
+      font-weight: 900;
+      font-size: 28px;
+      color: #7a3dc0;
+      margin-bottom: 8px;
+    }
+
+    .envios-producto p {
+      font-size: 18px;
+      color: #5a3e99;
+      text-align: center;
+      max-width: 350px;
+      font-weight: 600;
+      line-height: 1.3;
+    }
+
+    .envios-no-selection {
+      margin-top: 40px;
+      font-size: 20px;
+      color: #999;
+      font-style: italic;
+      text-align: center;
+      user-select: none;
+    }
+
+    h2 {
+      font-family: "Bungee", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+      text-shadow: 10px 8px 8px #ffff83;
+    }
+
+    h3 {
+      font-family: "Jersey 10", sans-serif;
+      font-weight: 400;
+      font-style: normal;
+    }
+
+    /* Boton inicio de sesion */
+    .login-btn {
+      padding: 10px 20px;
+      background-color: #a259ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+    }
+
+    .modal input {
+      width: 100%;
+      margin: 10px 0;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    .close-btn {
+      float: right;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* enlaces footer */
+    .btn {
+      color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    border-radius: 5px;
+    }
+    
+    .linea-vertical {
+    width: 2px;
+    height: 200px;
+    background-color: #686868;
+    margin: none;
+    border-radius: 1px;
+  }
+
+  </style>
+</head>
+
+<body>
+
+  <!-- Barra lateral -->
+  <div class="sidebar" id="sidebar">
+    <img src="https://img.icons8.com/ios-filled/50/menu.png" alt="Menú" onclick="toggleSidebar()" title="Menú" />
+    <img src="https://img.icons8.com/ios-filled/50/home.png" alt="Inicio"
+      onclick="showPage('inicio')" /><span>Inicio</span>
+    <img src="https://img.icons8.com/ios-filled/50/shop.png" alt="Tienda"
+      onclick="showPage('tienda')" /><span>Tienda</span>
+    <img src="https://img.icons8.com/ios-filled/50/shopping-cart.png" alt="Carrito"
+      onclick="showPage('carrito')" /><span>Carrito</span>
+    <img src="https://img.icons8.com/ios-filled/50/delivery.png" alt="Envíos"
+      onclick="showPage('envios')" /><span>Envíos</span>
+    <img src="./img/icons8-we-48.png" alt="Nosotros"
+      onclick="showPage('nosotros')" /><span>Nosotros</span>
+
+  </div>
+
+  <!-- Barra superior -->
+  <div class="topbar">
+    <div class="logo">
+      <img src="./img/LOGO SUBLIK 2.1.png" alt="Logo">
+      <span></span>
+      <input type="text" placeholder="Buscar" />
+    </div>
+    <div class="icons">
+      <img src="https://img.icons8.com/ios-filled/24/like.png" alt="Favoritos" />
+      <img src="https://img.icons8.com/ios-filled/24/thumb-up.png" alt="Like" />
+      <button class="login-btn" onclick="abrirLogin()">Iniciar sesión</button>
+      <button class="register-btn" onclick="abrirRegistro()">Registrarse</button>
+
+       <!-- Modal Registro -->
+  <div class="modal" id="registroModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="cerrarRegistro()">X</span>
+      <h3>Registrarse</h3>
+      <input type="text" placeholder="Nombre">
+      <input type="email" placeholder="Correo electrónico">
+      <input type="text" placeholder="Nombre de usuario">
+      <input type="password" placeholder="Crear contraseña">
+      <button onclick="alert('¡Registro simulado!')">Crear cuenta</button>
+    </div>
+  </div>
+
+  <script>
+    // Mostrar / ocultar login
+    function abrirLogin() {
+      document.getElementById("loginModal").style.display = "flex";
+    }
+    function cerrarLogin() {
+      document.getElementById("loginModal").style.display = "none";
+    }
+
+    // Mostrar / ocultar registro
+    function abrirRegistro() {
+      document.getElementById("registroModal").style.display = "flex";
+    }
+    function cerrarRegistro() {
+      document.getElementById("registroModal").style.display = "none";
+    }
+
+    // Validación ficticia de login
+    function validarLogin() {
+      const usuario = document.getElementById("usuarioLogin").value;
+      const clave = document.getElementById("claveLogin").value;
+
+      if (usuario === "admin" && clave === "1234") {
+        alert("¡Bienvenido!");
+        cerrarLogin();
+      } else {
+        alert("Usuario o contraseña incorrectos.");
+      }
+    }
+  </script>
+
+      <!-- Modal -->
+<div class="modal" id="loginModal">
+  <div class="modal-content">
+    <span class="close-btn" onclick="cerrarLogin()">X</span>
+    <h3>Iniciar sesión</h3>
+    <input type="text" placeholder="Usuario" id="usuario">
+    <input type="password" placeholder="Contraseña" id="clave">
+    <button onclick="validarLogin()">Entrar</button>
+  </div>
+</div>
+
+<script>
+  function abrirLogin() {
+    document.getElementById("loginModal").style.display = "flex";
+  }
+
+  function cerrarLogin() {
+    document.getElementById("loginModal").style.display = "none";
+  }
+
+  function validarLogin() {
+    const usuario = document.getElementById("usuario").value;
+    const clave = document.getElementById("clave").value;
+
+    // Esto es un ejemplo (NO seguro). Solo para pruebas.
+    if (usuario === "admin" && clave === "1234") {
+      alert("¡Bienvenido!");
+      cerrarLogin();
+    } else {
+      alert("Usuario o contraseña incorrectos.");
+    }
+  }
+</script>
+    </div>
+  </div>
+
+  <!-- Contenido principal -->
+  <div class="content" id="main-content">
+
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    const productos = [
+      { id: 'camisas', nombre: 'Camisas', img: './img/camisas.jpeg', descripcion: 'Camisas personalizadas para cualquier ocasión.' },
+      { id: 'sudaderas', nombre: 'Sudaderas', img: './img/sudadera.jpeg', descripcion: 'Sudaderas cómodas y con estilo único.' },
+      { id: 'gorras', nombre: 'Gorras', img: './img/sudadera.jpeg', descripcion: 'Gorras para protegerte con diseño propio.' },
+      { id: 'personalizados', nombre: 'Personalizados', img: './img/personalizador.jpeg', descripcion: 'Prendas 100% personalizadas a tu gusto.' }
+    ];
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('expanded');
+      document.querySelector('.topbar').classList.toggle('sidebar-expanded');
+      document.getElementById('main-content').classList.toggle('expanded');
+    }
+
+    function showPage(page) {
+      if (page === "tienda") {
+        renderTienda();
+      } else if (page === "envios") {
+        renderEnvios();
+      } else if (page === "carrito") {
+        renderCarrito();
+      } else if (page === "inicio") {
+        renderInicio();
+      } else if (page === "nosotros") {
+        renderNosotros();
+      } else {
+        document.getElementById("main-content").innerHTML = `
+        <h1 style="margin-top: 80px;">Página: ${page.charAt(0).toUpperCase() + page.slice(1)}</h1>
+        <p>Contenido de la página ${page}</p>
+      `;
+      }
+    }
+
+    function renderTienda() {
+      let html = `
+      <div class="tienda-banner">
+        <h2 style="text-shadow: none; font-size: 50px;">Renueva tu armario con ropa que tú mismo puedas personalizar</h2>
+        <p>Crea tus propios recuerdos</p>
+      </div>
+
+      <div class="productos">
+        <h3>Productos</h3>
+        <div class="grid-productos">
+    `;
+
+      const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+      productos.forEach(prod => {
+        const selectedClass = carrito.includes(prod.id) ? 'selected' : '';
+        html += `
+        <div class="producto ${selectedClass}" data-id="${prod.id}">
+          <img src="${prod.img}" alt="${prod.nombre}" />
+          <p>${prod.nombre}</p>
+        </div>
+      `;
+      });
+
+      html += `</div></div>`;
+      document.getElementById('main-content').innerHTML = html;
+
+      document.querySelectorAll('.producto').forEach(elem => {
+        elem.addEventListener('click', () => {
+          const id = elem.getAttribute('data-id');
+          let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+
+          if (carrito.includes(id)) {
+            carrito = carrito.filter(pid => pid !== id);
+            alert(`Producto quitado del carrito: ${productos.find(p => p.id === id).nombre}`);
+          } else {
+            carrito.push(id);
+            alert(`Producto añadido al carrito: ${productos.find(p => p.id === id).nombre}`);
+          }
+
+          localStorage.setItem('carrito', JSON.stringify(carrito));
+          renderTienda();
+        });
+      });
+    }
+
+    function renderEnvios() {
+      let html = `
+      <div class="banner">
+        <div>
+          <h1 style="font-size: 50px;">TARIFAS DE ENVÍO BAJAS DENTRO DEL PAÍS</h1>
+          <p>Algunas opciones populares podrían incluir BOLBox, FedEx, UPS, DHL, entre otros.</p>
+        </div>
+        <img src="./img/bolivia-silueta-01.png" alt="Bolivia" width="200"/>
+      </div>
+
+      <div class="delivery-steps">
+        <h2>Llevamos tus pedidos a su destino</h2>
+        <div class="steps">
+          <div class="step">
+            <img src="https://img.icons8.com/fluency/96/box.png" alt="Paso 1"/>
+            <p>1. La fabricación tarda entre 2 y 5 días hábiles en finalizar su producto y procesar su pedido.</p>
+          </div>
+          <div class="step">
+            <img src="https://img.icons8.com/fluency/96/delivery.png" alt="Paso 2"/>
+            <p>2. El tiempo de envío depende de la disponibilidad de los productos y del lugar de entrega.</p>
+          </div>
+          <div class="step">
+            <img src="https://img.icons8.com/fluency/96/packing.png" alt="Paso 3"/>
+            <p>3. Después de ser gestionados y enviados, los pedidos se entregan en la dirección final.</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+      document.getElementById('main-content').innerHTML = html;
+    }
+
+    function renderCarrito() {
+      const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+      const seleccionados = productos.filter(p => carrito.includes(p.id));
+
+      let html = `<center><h2 style="margin-top: 80px; text-shadow: none">Tu Carrito</h2></center>`;
+
+      if (seleccionados.length === 0) {
+        html += `<center><p>No has añadido productos al carrito.</p></center>`;
+      } else {
+        html += `<div class="grid-productos">`;
+        seleccionados.forEach(p => {
+          html += `
+          <div class="producto">
+            <img src="${p.img}" alt="${p.nombre}" />
+            <h3>${p.nombre}</h3>
+            <p>${p.descripcion}</p>
+            <button onclick="eliminarDelCarrito('${p.id}')">Quitar del carrito</button>
+          </div>
+        `;
+        });
+        html += `</div>`;
+      }
+
+      document.getElementById('main-content').innerHTML = html;
+    }
+
+    function eliminarDelCarrito(id) {
+      let carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+      carrito = carrito.filter(pid => pid !== id);
+      localStorage.setItem('carrito', JSON.stringify(carrito));
+      renderCarrito();
+    }
+
+    function renderInicio() {
+      const html = `
+      <div class="inicio-banner">
+        <center><h2 style="font-size: 60px; padding-left: 50px; padding-right: 50px;">Personaliza los mejores momentos de ti</h2></center>
+        
+          <center><video width="1220" height="690" controls>
+
+           <source src="img/Sublik.mp4" type="Video/mp4">
+           <source src="img/Sublik.mp4" type="Video/mp4">
+           <source src="img/Sublik.mp4" type="Video/mp4">
+   
+        </video></center>
+      </div>
+      <div class="delivery-steps">
+        <h2>Explora nuestras prendas más populares:</h2>
+      </div>
+
+       <hr style="border: none; height: 2px; background-color: #5a5a5a; width: 90%; margin-left: 50px;">
+
+       <div class="delivery-steps">
+        <h2 style="text-align: left; margin-left: 50px;">Categorias</h2>
+      </div>
+
+      <main class="container">
+        <div class="row" style="margin-left: 40px;">
+          <div class="col-6">
+            <img src="./img/Playeras-01.jpg" alt="Playeras-01">
+            <h6>Crea lo tuyo</h6>
+          </div>
+          <div class="col-3">
+            <img src="./img/Playeras-02.jpg" alt="Playeras-02">
+            <h6>Videojuegos</h6>
+         </div>
+         <div class="col-3">
+            <img src="./img/Playeras-03.jpg" alt="Playeras-03">
+            <h6>Anime</h6>
+         </div>
+       </div>
+
+       <div class="row" style="margin-left: 40px;">
+         <div class="col-6">
+            <img src="./img/Playeras-04.jpg" alt="Playeras-04">
+            <h6>Eventos</h6>
+         </div>
+         <div class="col-3">
+            <img src="./img/Playeras-05.jpg" alt="Playeras-05">
+            <h6>Festividades</h6>
+         </div>
+         <div class="col-3">
+            <img src="./img/Playeras-06.jpg" alt="Playeras-06">
+            <h6>Regalos</h6>
+         </div>
+       </div>
+      </main>
+
+      <hr style="border: none; height: 2px; background-color: #5a5a5a; width: 90%; margin-left: 50px;">
+
+      <div class="delivery-steps">
+        <h2 style="text-align: left; margin-left: 50px;">Tallas</h2>
+      </div>
+
+      <main class="container">
+  <div class="row" style="margin-left: 80px;">
+    <div class="col-4">
+      <img src="./img/Tallas y tipos-05.png" alt="Playera1">
+      <h6 class="derlivery-steps">Hombre</h6>
+      <p>Playera poliester</p>
+    </div>
+    <div class="col-4">
+      <img src="./img/Tallas y tipos-06.png" alt="Playera2">
+      <h6>Mujer</h6>
+      <p>Playera poliester</p>
+    </div>
+    <div class="col-4">
+      <img src="./img/Tallas y tipos-07.png" alt="Playera3">
+      <h6>Niño</h6>
+      <p>Playera poliester</p>
+    </div>
+  </div>
+
+  <div class="row" style="margin-left: 80px;">
+    <div class="col-4">
+      <img src="./img/Tallas y tipos-09.png" alt="Playera4">
+      <h6>Pañalero</h6>
+      <p>Tacto algodón</p>
+    </div>
+    <div class="col-4">
+      <img src="./img/Tallas y tipos-08.png" alt="Playera5">
+      <h6>Playera manga larga</h6>
+      <p>Tacto algodón</p>
+    </div>
+    <div class="col-4">
+      <img src="./img/Playera-04.png" alt="Playera6">
+      <h6>Sudaderas</h6>
+      <p>Tacto algodón</p>
+    </div>
+  </div>
+</main>
+
+      <hr style="border: none; height: 2px; background-color: #5a5a5a; width: 90%; margin-left: 50px;">
+
+      <div class="delivery-steps">
+        <h2 style="text-align: left; margin-left: 50px;">Colores</h2>
+      </div>
+
+      <main class="container">
+        <div class="row" style="margin-left: 60px;">
+          <div class="col-3">
+            <img src="./img/Playeras colores-01.jpg" alt="Playera1">
+          </div>
+          <div class="col-3">
+            <img src="/img/Playeras colores-02.jpg" alt="Playera2">
+          </div>
+          <div class="col-3">
+            <img src="./img/Playeras colores-03.jpg" alt="Playera3">
+          </div>
+          <div class="col-3">
+            <img src="./img/Playeras colores-04.jpg" alt="Playera4">
+          </div>
+        </div>
+      </main>
+    `;
+
+      document.getElementById('main-content').innerHTML = html;
+    }
+
+    function renderNosotros() {
+      const html = `
+      <div class="nosotros" style="margin: 80px 20px;">
+        <center><h2 class="h2"; style="color: #fdd835; font-size: 60px;">ACERCA DE NOSOTROS</h2></center>
+
+        <main class="container">
+          <div class="row">
+            <div class="col-7">
+              <h3 style="color: orange; font-size: 40px; class="h3">Misión</h3>
+              <p style="font-size: 20px;">Crear experiencias visuales únicas a través de productos personalizados en tela, utilizando técnicas de sublimación de alta calidad, que reflejen la identidad, creatividad y estilo de cada cliente.</p>      
+            </div>
+          <div class="col-3" style="margin-left: 200px;">
+            <img src="./img/Iconos-sobre nosotros-03.png" alt="arqueria">
+          </div>
+         </div>
+        </main>
+
+        <hr style="border: none; height: 2px; background-color: #5a5a5a; width: 100%;">
+
+        <main class="container">
+          <div class="row">
+            <div class="col-3" style="margin-left: 200px; font-size: 40px;">
+            <img src="./img/Iconos-sobre nosotros-02.png" alt="bombilla">
+          </div>
+          <div class="col-7" style="padding-left: 100px;">
+            <h3 style="color: orange; class="h3"">Visión</h3>
+            <p style="font-size: 20px;">Ser una marca referente en diseño textil personalizado a nivel nacional, destacando por su innovación, calidad visual, compromiso con el cliente y responsabilidad social.</p>
+          </div>
+          </div>
+        </main>
+
+        <hr style="border: none; height: 2px; background-color: #5a5a5a; width: 100%;">
+
+        <main class="container">
+         <div class="row">
+            <h3 style="color: orange; font-size: 40px; class="h3"">Valores</h3>
+         <div class="col-3">
+            <p style="font-size: 20px;"><strong>Calidad:</strong> Usamos insumos y técnicas profesionales para garantizar durabilidad y nitidez en cada sublimado.</p>
+            <p style="font-size: 20px;"><strong>Innovación:</strong> Buscamos constantemente nuevas formas de aplicar el diseño a la sublimación textil.</p>
+            <p style="font-size: 20px;"><strong>Creatividad:</strong> Promovemos ideas originales que se reflejan en cada diseño impreso.</p>     
+         </div>
+         <div class="col-3">
+            <p style="font-size: 20px;"><strong>Personalización:</strong> Cada producto está pensado para ajustarse al gusto, estilo y necesidad de cada cliente.</p>
+            <p style="font-size: 20px;"><strong>Pasión:</strong> Trabajamos con amor por el arte visual y por lo que representa llevarlo a una prenda.</p> 
+            <p style="font-size: 20px;"><strong>Responsabilidad:</strong> Nos comprometemos con prácticas responsables en el uso de materiales, tiempo de entrega y atención.</p> 
+         </div>
+         <div class="col-3" style="margin-left: 150px;">
+            <img src="./img/Iconos-sobre nosotros-04.png" alt="manos y corazon">
+         </div>
+         </div>
+       </main>
+      </div>
+    `;
+      document.getElementById('main-content').innerHTML = html;
+    }
+
+    // Mostrar la página de inicio al cargar
+    showPage('inicio');
+  </script>
+  <h2 class="h2"></h2>
+  <!-- Footer -->
+  <footer style="background: #333; color: white; padding: 20px; text-align: center; bottom: 0; width: 100%;">
+    <main class="container">
+      <center>
+        <div class="row">
+          <div class="col-3" style="margin-left: 200px;">
+            <img src="img/LOGO SUBLIK 2.1.png" alt="logo" width="250px">
+          </div>
+          <div class="linea-vertical"></div>
+          <div class="col-3">
+            <h6><a href="https://www.facebook.com/?locale=es_LA" target="_blank " class="btn">Facebook</a></h6>
+            <h6><a href="https://www.instagram.com/" target="_blank " class="btn">Instagram</a></h6>
+            <h6><a href="https://www.whatsapp.com/?lang=es_LA" target="_blank " class="btn">Whatsapp</a></h6>
+            <h6><a href="https://x.com/?lang=es" target="_blank " class="btn">X</a></h6>
+          </div>
+          <div class="linea-vertical"></div>
+          <div class="col-3">
+            <h6><a href="https://bo.linkedin.com/" target="_blank " class="btn">Linkedin</a></h6>
+            <h6><a href="https://www.youtube.com/" target="_blank " class="btn">Youtube</a></h6>
+            <h6><a href="https://www.tiktok.com/es/" target="_blank " class="btn">TikTok</a></h6>
+          </div>
+        </div>
+      </center>
+    </main>
+    &copy; 2025 Tienda de Ropa Personalizada. Todos los derechos reservados.
+  </footer>
+
+</body>
+
+</html>
